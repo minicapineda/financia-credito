@@ -1,20 +1,37 @@
 import federation from "@originjs/vite-plugin-federation";
 import react from "@vitejs/plugin-react";
 import path from "path";
-import { defineConfig, loadEnv } from "vite";
+import { defineConfig} from "vite";
+import fs from "fs"; 
 
-export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), '');
+interface RemoteConfig {
+  [key: string]: string;
+}
+
+export default defineConfig(() => {
+  const getRemotes = (): RemoteConfig => {
+    try {
+      const route = path.resolve(__dirname, "public", "microfrontends.json");
+      if (fs.existsSync(route)) {
+        const conten = fs.readFileSync(route, "utf-8");
+        return JSON.parse(conten) as RemoteConfig;
+      }
+      return {};
+    } catch (error) {
+      console.error("Error cargando microfrontends.json:", error);
+      return {};
+    }
+  };
+
+  const RemoteControls = getRemotes();
+  const namesRemotes = Object.keys(RemoteControls);
 
   return {
     plugins: [
       react(),
       federation({
         name: "dashboard",
-        remotes: {
-          
-          clientes: env.VITE_REMOTE_CLIENTES ,
-        },
+        remotes: RemoteControls,
         shared: [
           "react",
           "react-dom",
@@ -30,14 +47,22 @@ export default defineConfig(({ mode }) => {
       alias: {
         "@": path.resolve(__dirname, "./src"),
         "src": path.resolve(__dirname, "./src"),
+  
+        ...namesRemotes.reduce((acc, key) => {
+          acc[key] = key; 
+          return acc;
+        }, {} as Record<string, string>) 
       },
+    },
+    optimizeDeps: {
+      exclude: namesRemotes
     },
     server: {
       port: 5170,
       host: true,
       strictPort: true,
     },
-	build: {
+    build: {
       target: "esnext",
       minify: false,
       cssCodeSplit: false,
