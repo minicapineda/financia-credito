@@ -43,6 +43,7 @@ export default defineConfig({
 		target: "esnext", 
 		minify: false,
 		cssCodeSplit: false,
+		manifest: true,
 		modulePreload: false, 
 		rollupOptions: {
 			output: {
