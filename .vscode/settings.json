@@ -1,0 +1,6 @@
+{
+    "exportall.config.relExclusion": [
+        "/src/src/components/index.ts",
+        "/src/src/shared/index.ts"
+    ]
+}
