@@ -15,12 +15,12 @@ export const router = createBrowserRouter([
     {
         path: "/",
         element: <Dashboard />,
-        // Si el error ocurre en cualquier hijo (como Clientes), este se activará
+
         errorElement: <ErrorFallback moduleName="Aplicación Principal" />, 
         children: [
             {
                 path: ROUTES.CLIENTES,
-                // Mantenlo aquí también por si el error es solo de este módulo
+              
                 errorElement: <ErrorFallback moduleName="Módulo de Clientes" />, 
                 element: (
                     <RemoteErrorBoundary moduleName="Clientes">
